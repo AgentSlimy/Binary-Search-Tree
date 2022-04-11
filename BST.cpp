@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void PARSE();
+void PARSE(char* in, int* modify, int& count);
 
 int main() {
   bool running = true;
@@ -66,6 +66,24 @@ int main() {
     }
     else {
       cout << endl << "Input invalid, try again" << endl;
+    }
+  }
+}
+
+void PARSE(char* in, int* modify, int& count) {
+  int x = 0;
+  for (int i = 0; i < strlen(in); i++) {
+    if (in[i] == ' ') {
+      if (x == 1) {
+	int temp = 0;
+	temp = in[i - 1] - '0';
+	modify[count] = temp;
+	count++;
+	x = 0;
+      }
+      else {
+	
+      }
     }
   }
 }
