@@ -47,7 +47,6 @@ int main() {
     int count = 0; //Number of chars
     int modify[100];
     int modSize = 0; //Size of modify array
-
     cout << "Binary Search Tree" << endl << endl;
     while (running == true) {
         memset(input, 0, 10000);
