@@ -1,6 +1,6 @@
 //Author: Nathan Zou
 //Date: 4/21/22
-//Done with help from Chris Zou and Stefan Ene
+//Done with help from Chris Zou, Stefan Ene, and Jayden Huang
 /*
 Other Resources Used:
 Previously done Heap: https://github.com/AgentSlimy/Heap
@@ -36,7 +36,7 @@ void showTrunks(Trunk* p) { //Uesd for printing
 void PARSE(char* in, int* modify, int& count);
 void BUILD(Node*& head, Node*& current, Node*& previous, int value);
 void PRINT(Node* root, Trunk *prev, bool isLeft);
-Node* SEARCH();
+void SEARCH(Node* current, int &data);
 Node* DELETE();
 
 int main() {
@@ -125,16 +125,32 @@ int main() {
 		cout << endl << endl;
 		bool inTree = true;
 		char treeCom[10];
+    int searchInput;
 		while (inTree == true) {
 		  cout << "Tree Options: Search, Add, Delete, Quit" << endl;
 		  cin.get(treeCom, 10);
 		  cin.clear();
 		  cin.ignore(10000, '\n');
 		  if (strcmp(treeCom, "Search") == 0) {
-		    //Search
+		    cout << "Search Value: ";
+        cin >> searchInput;
+        cin.clear();
+        cin.ignore(10000, '\n');
+        SEARCH(head, searchInput);
 		  }
 		  else if (strcmp(treeCom, "Add") == 0) {
-		    //Add
+		    int value;
+        cout << "Add Value: ";
+        cin >> value;
+        cin.clear();
+        cin.ignore(10000, '\n');
+        Node* current = NULL;
+        Node* previous = NULL;
+        current = head;
+        BUILD(head, current, previous, value);
+        cout << endl << value << " added to tree." << endl << endl;
+        PRINT(head, NULL, false);
+        cout << endl;
 		  }
 		  else if (strcmp(treeCom, "Delete") == 0) {
 		    //Delete
@@ -256,4 +272,28 @@ void PRINT(Node* root, Trunk *previous, bool isLeft) { //Print functions, prints
   }
   trunk->str = (char*)("   |");
   PRINT(root->getRight(), trunk, false);
+}
+
+void SEARCH(Node* current, int& data) { //Search function, used to find a specific value in a given tree
+    while (current->getData() != data && current != NULL) {
+        if (current != NULL) {
+            if (current->getData() > data) {
+                current = current->getLeft();
+            }
+            else {
+                current = current->getRight();
+            }
+        }
+        if (current == NULL) {
+            break;
+        }
+    }
+    if (current != NULL) {
+        if (current->getData() == data) {
+            cout << "The element is present in the list!" << endl << endl;
+        }
+    }
+    else {
+        cout << "The element is not present in the list!" << endl << endl;
+    }
 }
