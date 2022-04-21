@@ -5,6 +5,7 @@
 Other Resources Used:
 Previously done Heap: https://github.com/AgentSlimy/Heap
 Printing Tree: https://www.techiedelight.com/c-program-print-binary-tree
+Deleting from a BST: https://www.youtube.com/watch?v=gcULXE7ViZw
 */
 
 #include <iostream>
@@ -37,7 +38,7 @@ void PARSE(char* in, int* modify, int& count);
 void BUILD(Node*& head, Node*& current, Node*& previous, int value);
 void PRINT(Node* root, Trunk *prev, bool isLeft);
 void SEARCH(Node* current, int &data);
-Node* DELETE();
+Node* DELETE(Node* &root, int value);
 
 int main() {
     bool running = true;
@@ -57,7 +58,7 @@ int main() {
         cin.get(command, 10);
         cin.clear();
         cin.ignore(10000, '\n');
-        if (strcmp(command, "Run") == 0) {
+        if (strcmp(command, "Run") == 0) { //Run command, prompts for tree input (manual or file)
             cout << "File input or Manual input? ";
             cin.get(command, 10);
             cin.clear();
@@ -125,51 +126,59 @@ int main() {
 		cout << endl << endl;
 		bool inTree = true;
 		char treeCom[10];
-    int searchInput;
+		int searchInput;
 		while (inTree == true) {
 		  cout << "Tree Options: Search, Add, Delete, Quit" << endl;
 		  cin.get(treeCom, 10);
 		  cin.clear();
 		  cin.ignore(10000, '\n');
-		  if (strcmp(treeCom, "Search") == 0) {
+		  if (strcmp(treeCom, "Search") == 0) { //Search command, searches for a value in the tree
 		    cout << "Search Value: ";
-        cin >> searchInput;
-        cin.clear();
-        cin.ignore(10000, '\n');
-        SEARCH(head, searchInput);
+		    cin >> searchInput;
+		    cin.clear();
+		    cin.ignore(10000, '\n');
+		    SEARCH(head, searchInput);
 		  }
-		  else if (strcmp(treeCom, "Add") == 0) {
+		  else if (strcmp(treeCom, "Add") == 0) { //Add command, adds a new node to the tree
 		    int value;
-        cout << "Add Value: ";
-        cin >> value;
-        cin.clear();
-        cin.ignore(10000, '\n');
-        Node* current = NULL;
-        Node* previous = NULL;
-        current = head;
-        BUILD(head, current, previous, value);
-        cout << endl << value << " added to tree." << endl << endl;
-        PRINT(head, NULL, false);
-        cout << endl;
+		    cout << "Add Value: ";
+		    cin >> value;
+		    cin.clear();
+		    cin.ignore(10000, '\n');
+		    Node* current = NULL;
+		    Node* previous = NULL;
+		    current = head;
+		    BUILD(head, current, previous, value);
+		    cout << endl << value << " added to tree." << endl << endl;
+		    PRINT(head, NULL, false);
+		    cout << endl;
 		  }
-		  else if (strcmp(treeCom, "Delete") == 0) {
-		    //Delete
+		  else if (strcmp(treeCom, "Delete") == 0) { //Delete command, deletes a node from the tree
+		    int deleteValue;
+		    cout << "Delete Value: ";
+		    cin >> deleteValue;
+		    cin.clear();
+		    cin.ignore(10000, '\n');
+		    head = DELETE(head, deleteValue);
+		    cout << endl << deleteValue << " deleted from tree." << endl << endl;
+		    PRINT(head, NULL, false);
+		    cout << endl;
 		  }
-		  else if (strcmp(treeCom, "Quit") == 0) {
+		  else if (strcmp(treeCom, "Quit") == 0) { //Quit commands, quits current tree
 		    cout << "Quitting Current Tree" << endl << endl;
 		    inTree = false;
 		  }
-		  else {
+		  else { //Invalid commands, prompts tree commands again
 		    cout << endl << "Invalid Command, Try Again." << endl;
 		  }
 		}
             }
         }
-        else if (strcmp(command, "Quit") == 0) {
+        else if (strcmp(command, "Quit") == 0) { //Quit command, quits program
             cout << endl << "Quitting Program." << endl;
             running = false;
         }
-        else {
+        else { //Invalid command, prompts beginning commands
             cout << endl << "Input invalid, try again" << endl;
         }
     }
@@ -253,6 +262,7 @@ void PRINT(Node* root, Trunk *previous, bool isLeft) { //Print functions, prints
   char* prevStr = (char*)("    ");
   Trunk *trunk = new Trunk(previous, prevStr);
   PRINT(root->getLeft(), trunk, true);
+  //Formatting tree
   if (!previous) {
     trunk->str = (char*)("---");
   }
@@ -289,11 +299,57 @@ void SEARCH(Node* current, int& data) { //Search function, used to find a specif
         }
     }
     if (current != NULL) {
-        if (current->getData() == data) {
+      if (current->getData() == data) { //Number is in the list
             cout << "The element is present in the list!" << endl << endl;
         }
     }
-    else {
+    else { //Number is not in the list
         cout << "The element is not present in the list!" << endl << endl;
     }
+}
+
+Node* DELETE(Node* &root, int value) { //Delete function, deletes a node from the tree
+  Node* left = root->getLeft();
+  Node* right = root->getRight();
+  if (root == NULL) {
+    return root;
+  }
+  else if (value < root->getData()) {
+    root->setLeft(DELETE(left, value));
+  }
+  else if (value > root->getData()) {
+    root->setRight(DELETE(right, value));
+  }
+  else { //If the root node is to be delete
+    if (root->getRight() == NULL && root->getLeft() == NULL) { //If there is no child nodes
+      root->~Node();
+      root = NULL;
+      return root;
+    }
+    //If there is one child node that exists
+    else if (root->getLeft() == NULL) { //The right child node exists
+      Node* temp = root;
+      root = root->getRight();
+      temp->~Node();
+      return root;
+    }
+    else if (root->getRight() == NULL) { //The left child node exists
+      Node* temp = root;
+      root = root->getLeft();
+      temp->~Node();
+      return root;
+    }
+    else { //If there are two child nodes that exists
+      //Find the minimum on the right
+      Node* temp = root->getRight();
+      while (temp->getLeft() != NULL) {
+	temp = temp->getLeft();
+      }
+      //Delete/replacement
+      root->setData(temp->getData());
+      Node* r = root->getRight();
+      root->setRight(DELETE(r, temp->getData()));
+    }
+  }
+  return root;
 }
